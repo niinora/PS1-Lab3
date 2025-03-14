@@ -37,13 +37,15 @@ export function toBucketSets(buckets: BucketMap): Array<Set<Flashcard>> {
  *          or undefined if no buckets contain cards.
  * @spec.requires buckets is a valid Array-of-Set representation of flashcard buckets.
  */
-export function getBucketRange(
-  buckets: Array<Set<Flashcard>>
-): { minBucket: number; maxBucket: number } | undefined {
-  // TODO: Implement this function
-  throw new Error("Implement me!");
+export function getBucketRange(bucketIndex: number, bucketCount: number, minValue: number, maxValue: number): { start: number, end: number } {
+  const rangeSize = (maxValue - minValue) / bucketCount;
+  const start = minValue + bucketIndex * rangeSize;
+  const end = bucketIndex === bucketCount - 1 ? maxValue : start + rangeSize;
+  return { 
+      start: Math.round(start * 100) / 100, 
+      end: Math.round(end * 100) / 100 
+  };
 }
-
 /**
  * Selects cards to practice on a particular day.
  *
