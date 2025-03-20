@@ -118,11 +118,25 @@ describe("getBucketRange()", () => {
  *
  * TODO: Describe your testing strategy for getHint() here.
  */
-describe("getHint()", () => {
-  it("Example test case - replace with your own tests", () => {
-    assert.fail(
-      "Replace this test case with your own tests based on your testing strategy"
-    );
+
+describe('getHint', () => {
+  it('should return the hint when a valid hint is provided', () => {
+    const flashcard1 = new Flashcard('What is the capital of France?', 'Paris', 'City of lights', ['geography']);
+    const hint1 = getHint(flashcard1);
+    assert.strictEqual(hint1, 'City of lights', 'The hint should be "City of lights"');
+  });
+
+  it('should return "No hint available." when the hint is empty', () => {
+    const flashcard2 = new Flashcard('What is the capital of Spain?', 'Madrid', '', ['geography']);
+    const hint2 = getHint(flashcard2);
+    assert.strictEqual(hint2, 'No hint available.', 'The hint should be "No hint available."');
+  });
+
+  it('should handle flashcards with no hint properly', () => {
+    const flashcard3 = new Flashcard('What is the largest ocean?', 'Pacific', '', ['geography']);
+    const hint3 = getHint(flashcard3);
+    assert.strictEqual(hint3, 'No hint available.', 'The hint should be "No hint available."');
+    
   });
 });
 
@@ -131,10 +145,38 @@ describe("getHint()", () => {
  *
  * TODO: Describe your testing strategy for computeProgress() here.
  */
-describe("computeProgress()", () => {
-  it("Example test case - replace with your own tests", () => {
-    assert.fail(
-      "Replace this test case with your own tests based on your testing strategy"
-    );
+
+describe('computeProgress Function', () => {
+  it('should return updated progress and overall progress when some answers are correct', () => {
+    const result1 = computeProgress([10, 20, 30], [true, false, true]);
+    assert.deepStrictEqual(result1.topicProgress, [15, 20, 35]);
+    assert.strictEqual(result1.overallProgress, 23.333333333333332);
+  });
+
+  it('should handle all correct answers and update progress for each topic', () => {
+    const result2 = computeProgress([10, 20, 30], [true, true, true]);
+assert.deepStrictEqual(result2.topicProgress, [15, 25, 35]);
+assert.strictEqual(result2.overallProgress, 25);
+  });
+
+  it('should handle all incorrect answers and keep the progress unchanged', () => {
+    const result3 = computeProgress([10, 20, 30], [false, false, false]);
+    assert.deepStrictEqual(result3.topicProgress, [10, 20, 30]);
+    assert.strictEqual(result3.overallProgress, 20);
+  });
+
+  it('should return an Nan if buckets is undefined', () => {
+    const result4 = computeProgress(undefined, [true, false, true]);
+    assert.deepStrictEqual(result4, { overallProgress: NaN, topicProgress: [] });
+    
+  const result5 = computeProgress([], []);
+  assert.deepStrictEqual(result5, { overallProgress: NaN, topicProgress: [] });
+  });
+
+
+  it('should cap progress at 100 if topics are near the maximum progress', () => {
+    const result6 = computeProgress([95, 99, 100], [true, true, true]);
+    assert.deepStrictEqual(result6.topicProgress, [100, 100, 100]);
+    assert.strictEqual(result6.overallProgress, 100);
   });
 });

@@ -84,25 +84,52 @@ export function update(
 /**
  * Generates a hint for a flashcard.
  *
- * @param card flashcard to hint
- * @returns a hint for the front of the flashcard.
- * @spec.requires card is a valid Flashcard.
+ * @param card The flashcard to generate a hint for.
+ * @returns A hint for the front of the flashcard, which should be a subset of the hint provided in the Flashcard.
+ *          The hint can be empty if no hint exists.
+ * @spec.requires card is a valid Flashcard with a non-empty `hint` property.
+ * @spec.effects Returns the hint string from the Flashcard's `hint` property.
  */
 export function getHint(card: Flashcard): string {
   // TODO: Implement this function (and strengthen the spec!)
-  throw new Error("Implement me!");
+  if (card.hint) {
+    return card.hint;
+  }
+  return "No hint available.";
 }
 
 /**
- * Computes statistics about the user's learning progress.
+ * Computes the user's learning progress based on their answer history.
  *
- * @param buckets representation of learning buckets.
- * @param history representation of user's answer history.
- * @returns statistics about learning progress.
- * @spec.requires [SPEC TO BE DEFINED]
+ * @param {number[] | undefined} buckets - An array representing current progress for each topic (0 to 100).
+ * @param {boolean[]} history - An array representing if each answer was correct (true) or incorrect (false).
+ *
+ * @returns {object} An object containing:
+ *   - overallProgress {number}: The average progress across all topics.
+ *   - topicProgress {number[]}: Updated progress for each topic.
+ *
+ * @spec.requires buckets must be an array of numbers between 0 and 100 or undefined.
+ * @spec.effects Increases progress by +5 for correct answers (capped at 100), leaves incorrect ones unchanged.
+ *               Returns { overallProgress: NaN, topicProgress: [] } if buckets is undefined or empty.
  */
-export function computeProgress(buckets: any, history: any): any {
-  // Replace 'any' with appropriate types
-  // TODO: Implement this function (and define the spec!)
-  throw new Error("Implement me!");
+
+export function computeProgress(
+  buckets: number[] | undefined,
+  history: boolean[]
+): { overallProgress: number; topicProgress: number[] } {
+  // Handle undefined or empty buckets
+  if (!buckets || buckets.length === 0) {
+    return { overallProgress: NaN, topicProgress: [] };
+  }
+
+  // Compute new progress per topic
+  const topicProgress = buckets.map((progress, index) =>
+    history[index] ? Math.min(progress + 5, 100) : progress
+  );
+
+  // Calculate overall progress as the average of topic progress
+  const totalProgress = topicProgress.reduce((sum, val) => sum + val, 0);
+  const overallProgress = totalProgress / topicProgress.length;
+
+  return { overallProgress, topicProgress };
 }
