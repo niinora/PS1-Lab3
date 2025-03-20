@@ -92,9 +92,19 @@ export function update(
  */
 export function getHint(card: Flashcard): string {
   // TODO: Implement this function (and strengthen the spec!)
+  if (card === null) {
+    return "Error: No card provided.";
+  }
+
+  if (card.hint === null){
+    return `Hint unavailable. Remember: ${card.front}`;
+  }
   if (card.hint) {
     return card.hint;
   }
+
+  // If the hint is missing, fall back to the front of the card
+  return "something unexpected"
   return "No hint available.";
 }
 
